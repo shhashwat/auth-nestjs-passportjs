@@ -5,6 +5,9 @@ import { UsersModule } from 'src/users/users.module';
 import { JwtModule } from '@nestjs/jwt';
 import * as fs from 'fs';
 import * as dotenv from 'dotenv';
+import { PassportModule } from '@nestjs/passport';
+import { LocalStrategy } from './strategies/local.strategies';
+import { JwtStrategy } from './strategies/jwt.strategies';
 dotenv.config();
 
 const privateKey = process.env.JWT_PRIVATE_KEY_PATH;
@@ -15,7 +18,7 @@ if (!privateKey || !publicKey) {
 }
 
 @Module({
-  providers: [AuthService],
+  providers: [AuthService, LocalStrategy, JwtStrategy],
   controllers: [AuthController],
   imports: [
     UsersModule,
@@ -24,7 +27,8 @@ if (!privateKey || !publicKey) {
       privateKey: fs.readFileSync(privateKey),
       publicKey: fs.readFileSync(publicKey),
       signOptions: { algorithm: 'ES256', expiresIn: '1d' },
-    })
+    }),
+    PassportModule
   ],
 })
 
